@@ -17,20 +17,27 @@ def process_output(file_name: str, output: List[str]):
 
 
 def process_ipynb(file_name: str):
-    with open(f"{file_name}.ipynb") as ff:
-        a = json.loads(ff.read())
+    ipynb_file = f"{file_name}.ipynb"
+    py_file = f"{file_name}.py"
+
+    with open(ipynb_file) as ff:
         source = []
         outputs = []
-
+        a = json.loads(ff.read())
         for i in a['cells']:
             if not ('source' in i and 'outputs' in i):
                 continue
 
-            source += (i['source']+['\n'])
-            outputs += (i['outputs'][0]['text']+['\n'])
+            source += [] if len(i['source']) == 0 else (i['source']+['\n'])
+            outputs += [] if len(i['outputs']) == 0 else (i['outputs'][0]['text']+['\n'])
 
-        process_source("first_day.py", source)
-        process_output("first_day.py", outputs)
+        if os.path.exists(ipynb_file):
+            os.remove(ipynb_file)
+        if os.path.exists(py_file):
+            os.remove(py_file)
+
+        process_source(py_file, source)
+        process_output(py_file, outputs)
 
 
 for i in os.listdir('./'):
